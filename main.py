@@ -2,6 +2,14 @@ from sys import exit
 import os
 import pygame
 
+# Sprite classes
+class Snake(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()   
+        self.image = pygame.Surface([20,20])
+        self.image.fill("#21FA90")
+        self.rect = self.image.get_rect(center=(375,375))
+
 # Functions to load resources
 def loadImage(name):
     working_dir = os.path.dirname(__file__)
@@ -19,12 +27,14 @@ def loadFont(name,size):
 # Setup - ADMIN
 pygame.init()
 pygame.display.set_caption("Snake")
-screen = pygame.display.set_mode((400,400))
+screen = pygame.display.set_mode((750,750))
 
 # Setup - TIMERS
 clock = pygame.time.Clock()
 
-# Surfaces - ACTIVE
+# Sprites
+snake_group = pygame.sprite.GroupSingle()
+snake_group.add(Snake())
 
 while True:
 
@@ -36,7 +46,10 @@ while True:
             pygame.quit()
             exit()
     
-    screen.fill("blue")
+    # display
+    screen.fill(("#191919"))
+    snake_group.draw(screen)
+    snake_group.update()
 
     # update the whole screen every frame
     pygame.display.update()
