@@ -9,7 +9,10 @@ class Snake(pygame.sprite.Sprite):
         self.image = pygame.Surface([20,20])
         self.image.fill("#21FA90")
         self.rect = self.image.get_rect(center=(375,375))
-        self.direction = "west" 
+        self.direction = "west"
+
+    def check_bounds(self) -> bool:
+        return screen.get_rect().contains(self.rect)
 
 # Functions to load resources
 def loadImage(name):
@@ -29,6 +32,7 @@ def loadFont(name,size):
 pygame.init()
 pygame.display.set_caption("Snake")
 screen = pygame.display.set_mode((750,750))
+game_active = True
 
 # Setup - TIMERS
 clock = pygame.time.Clock()
@@ -50,25 +54,44 @@ while True:
             pygame.quit()
             exit()
 
-        # TIMER event (for snake)
-        if event.type == snake_timer:
-            direction = SS.direction
-            if direction == "west": SS.rect.x -= 20
-            elif direction == "north": SS.rect.y -= 20
-            elif direction == "south": SS.rect.y += 20
-            else: SS.rect.x += 20
+        # ACTIVE-mode events
+        if game_active:
+            # TIMER event (for snake)
+            if event.type == snake_timer:
+                direction = SS.direction
+                if direction == "west": SS.rect.x -= 20
+                elif direction == "north": SS.rect.y -= 20
+                elif direction == "south": SS.rect.y += 20
+                else: SS.rect.x += 20
+            
+            # KEY event (change direction)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_LEFT and (SS.direction in ["north","south"]): SS.direction = "west"
+                elif event.key == pygame.K_UP and (SS.direction in ["west","east"]): SS.direction = "north"
+                elif event.key == pygame.K_RIGHT and (SS.direction in ["north","south"]): SS.direction = "east"
+                elif event.key == pygame.K_DOWN and (SS.direction in ["west","east"]): SS.direction = "south"
         
-        # KEY event (change direction)
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT and (SS.direction in ["north","south"]): SS.direction = "west"
-            elif event.key == pygame.K_UP and (SS.direction in ["west","east"]): SS.direction = "north"
-            elif event.key == pygame.K_RIGHT and (SS.direction in ["north","south"]): SS.direction = "east"
-            elif event.key == pygame.K_DOWN and (SS.direction in ["west","east"]): SS.direction = "south"
+        # NONACTIVE-mode events
+        else:
+            # KEY event (restart game)
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                SS.rect.center = (375,375)
+                game_active = True
 
-    # display
-    screen.fill(("#191919"))
-    snake_group.draw(screen)
-    snake_group.update()
+    # what to display in ACTIVE-mode 
+    if game_active:
+
+        # check if snake sprite has left screen
+        game_active = SS.check_bounds()
+
+        # display screen background, snake
+        screen.fill(("#191919"))
+        snake_group.draw(screen)
+        snake_group.update()
+
+    # what to display in NONACTIVE-mode
+    else:
+        screen.fill("blue")
 
     # update the whole screen every frame
     pygame.display.update()
