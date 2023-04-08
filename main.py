@@ -9,6 +9,7 @@ class Snake(pygame.sprite.Sprite):
         self.image = pygame.Surface([20,20])
         self.image.fill("#21FA90")
         self.rect = self.image.get_rect(center=(375,375))
+        self.direction = "west" 
 
 # Functions to load resources
 def loadImage(name):
@@ -31,10 +32,13 @@ screen = pygame.display.set_mode((750,750))
 
 # Setup - TIMERS
 clock = pygame.time.Clock()
+snake_timer = pygame.USEREVENT + 1
+pygame.time.set_timer(snake_timer,500)
 
 # Sprites
 snake_group = pygame.sprite.GroupSingle()
 snake_group.add(Snake())
+SS = snake_group.sprite
 
 while True:
 
@@ -45,7 +49,15 @@ while True:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
-    
+
+        # TIMER event (for snake)
+        if event.type == snake_timer:
+            direction = SS.direction
+            if direction == "west": SS.rect.x -= 20
+            elif direction == "north": SS.rect.y -= 20
+            elif direction == "south": SS.rect.y += 20
+            else: SS.rect.x += 20
+
     # display
     screen.fill(("#191919"))
     snake_group.draw(screen)
