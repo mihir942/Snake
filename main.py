@@ -57,6 +57,13 @@ while True:
             elif direction == "north": SS.rect.y -= 20
             elif direction == "south": SS.rect.y += 20
             else: SS.rect.x += 20
+        
+        # KEY event (change direction)
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_LEFT: SS.direction = "west"
+            elif event.key == pygame.K_UP: SS.direction = "north"
+            elif event.key == pygame.K_RIGHT: SS.direction = "east"
+            elif event.key == pygame.K_DOWN: SS.direction = "south"
 
     # display
     screen.fill(("#191919"))
