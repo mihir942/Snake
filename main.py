@@ -39,7 +39,7 @@ subtitlefont = loadFont('babyblues.ttf',30)
 # Setup - TIMERS
 clock = pygame.time.Clock()
 snake_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(snake_timer,500)
+pygame.time.set_timer(snake_timer,300)
 
 # Sprites
 snake_group = pygame.sprite.GroupSingle()
@@ -99,8 +99,6 @@ while True:
 
     # what to display in NONACTIVE-mode
     else: 
-        # screen.fill("#D34E24")
-        # screen.fill("#8A3217")
         screen.fill('#A03A1B')
         screen.blit(title,title_rect)
         screen.blit(subtitle,subtitle_rect)
