@@ -32,7 +32,9 @@ def loadFont(name,size):
 pygame.init()
 pygame.display.set_caption("Snake")
 screen = pygame.display.set_mode((750,750))
-game_active = True
+game_active = False
+titlefont = loadFont('babyblues.ttf',150)
+subtitlefont = loadFont('babyblues.ttf',30)
 
 # Setup - TIMERS
 clock = pygame.time.Clock()
@@ -43,6 +45,12 @@ pygame.time.set_timer(snake_timer,500)
 snake_group = pygame.sprite.GroupSingle()
 snake_group.add(Snake())
 SS = snake_group.sprite
+
+# Surfaces - NONACTIVe
+title = titlefont.render("snake",False,'White')
+title_rect = title.get_rect(center = (375,340))
+subtitle = subtitlefont.render("the retro game",False,'White')
+subtitle_rect = subtitle.get_rect(center=(375,420))
 
 while True:
 
@@ -90,8 +98,12 @@ while True:
         snake_group.update()
 
     # what to display in NONACTIVE-mode
-    else:
-        screen.fill("blue")
+    else: 
+        # screen.fill("#D34E24")
+        # screen.fill("#8A3217")
+        screen.fill('#A03A1B')
+        screen.blit(title,title_rect)
+        screen.blit(subtitle,subtitle_rect)
 
     # update the whole screen every frame
     pygame.display.update()
