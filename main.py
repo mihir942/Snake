@@ -1,15 +1,17 @@
 from sys import exit
 import os
 import pygame
+import pygame.gfxdraw
 from random import randrange
 
 # Sprite classes
 class Food(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface([20,20])
-        self.image.fill('#A03A1B')
-        self.rect = self.image.get_rect(center=(randrange(20,740,20),randrange(20,740,20)))
+
+        self.image = loadImage('apple.png').convert_alpha()
+        self.image = pygame.transform.rotozoom(self.image,0,0.6) 
+        self.rect = self.image.get_rect(center = (randrange(20,740,20),randrange(20,740,20)))
 
 # Functions to load resources
 def loadImage(name):
@@ -34,9 +36,9 @@ titlefont = loadFont('babyblues.ttf',150)
 subtitlefont = loadFont('babyblues.ttf',30)
 
 # Setup - SNAKE VARIABLES
-S_direction = "west"
-S_length = 1
-S_path = []
+S_DIRECTION = "west"
+S_LENGTH = 1
+S_PATH = []
 
 # Setup - TIMERS
 clock = pygame.time.Clock()
@@ -67,41 +69,41 @@ while True:
         if game_active:
             # TIMER event (for snake)
             if event.type == snake_timer:
-                head,next_pos = S_path[0],(0,0)
-                if S_direction == "west":  next_pos = (head[0] - 20,head[1])
-                elif S_direction == "north": next_pos = (head[0],head[1] - 20)
-                elif S_direction == "east": next_pos = (head[0] + 20, head[1])
+                head,next_pos = S_PATH[0],(0,0)
+                if S_DIRECTION == "west":  next_pos = (head[0] - 20,head[1])
+                elif S_DIRECTION == "north": next_pos = (head[0],head[1] - 20)
+                elif S_DIRECTION == "east": next_pos = (head[0] + 20, head[1])
                 else: next_pos = (head[0],head[1] + 20)
-                S_path.insert(0,next_pos)
+                S_PATH.insert(0,next_pos)
 
             # KEY event (change direction)
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT and (S_direction in ["north","south"]): S_direction = "west"
-                elif event.key == pygame.K_UP and (S_direction in ["west","east"]): S_direction = "north"
-                elif event.key == pygame.K_RIGHT and (S_direction in ["north","south"]): S_direction = "east"
-                elif event.key == pygame.K_DOWN and (S_direction in ["west","east"]): S_direction = "south"
+                if event.key == pygame.K_LEFT and (S_DIRECTION in ["north","south"]): S_DIRECTION = "west"
+                elif event.key == pygame.K_UP and (S_DIRECTION in ["west","east"]): S_DIRECTION = "north"
+                elif event.key == pygame.K_RIGHT and (S_DIRECTION in ["north","south"]): S_DIRECTION = "east"
+                elif event.key == pygame.K_DOWN and (S_DIRECTION in ["west","east"]): S_DIRECTION = "south"
         
         # NONACTIVE-mode events
         else:
             # KEY event (start / restart game)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 start_position = (380,380)
-                S_path.append(start_position)
-                S_direction = "west"
+                S_PATH.append(start_position)
+                S_DIRECTION = "west"
                 game_active = True
 
     # what to display in ACTIVE-mode 
     if game_active:
 
         # control snake length
-        S_path = S_path[0:S_length]
+        S_PATH = S_PATH[0:S_LENGTH]
 
         # generate food if no food
         if not food_group: food_group.add(Food())
 
         # check for collisions
-        if S_path[0] == food_group.sprites()[0].rect.center:
-            S_length += 1
+        if S_PATH[0] == food_group.sprites()[0].rect.center:
+            S_LENGTH += 1
             food_group.empty()
 
         # display background
@@ -109,7 +111,7 @@ while True:
         food_group.draw(screen)
 
         # display snake
-        for position in S_path:
+        for position in S_PATH:
             snake_surface = pygame.Surface((20,20))
             snake_rect = pygame.draw.rect(snake_surface,'#21FA90',snake_surface.get_rect(),width=0,border_radius=5)
             snake_rect.center=position
