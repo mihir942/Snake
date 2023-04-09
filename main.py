@@ -12,7 +12,7 @@ class Food(pygame.sprite.Sprite):
         self.image = loadImage('apple.png').convert_alpha()
         self.image = pygame.transform.rotozoom(self.image,0,0.6)
         self.rect = self.image.get_rect(center = (randrange(20,screen_width - 20,20),randrange(20,screen_height - 20,20)))
-        
+
 # Functions to load resources
 def loadImage(name):
     working_dir = os.path.dirname(__file__)
@@ -34,6 +34,10 @@ screen_width = 600
 screen_height = 600
 screen = pygame.display.set_mode((screen_width,screen_height))
 game_active = False
+score_sound = loadAudio('score.mp3')
+raw = score_sound.get_raw()
+raw = raw[50000:] 
+score_sound = pygame.mixer.Sound(buffer=raw)
 titlefont = loadFont('babyblues.ttf',150)
 subtitlefont = loadFont('babyblues.ttf',30)
 scorefont = loadFont('babyblues.ttf',20)
@@ -111,6 +115,7 @@ while True:
                 S_LENGTH = 1
                 S_PATH = [start_position]
                 S_DIRECTION = "west"
+                food_group.empty()
                 game_active = True
 
     # what to display in ACTIVE-mode 
@@ -132,6 +137,7 @@ while True:
         if coll_rect.colliderect(food_group.sprites()[0].rect):
             S_LENGTH += 1
             food_group.empty()
+            score_sound.play()
 
         # collision with wall or itself
         conditions = centerx in range(20,580) and centery in range(20,580) and len(set(S_PATH)) == len(S_PATH)
@@ -142,8 +148,8 @@ while True:
         food_group.draw(screen)
 
         # display score
-        score = scorefont.render(f"Score: {S_LENGTH - 1} ",False,'White')
-        score_rect = score.get_rect(center=(530,570))
+        score = scorefont.render(f"Length: {S_LENGTH} | Score: {S_LENGTH - 1} ",False,'White')
+        score_rect = score.get_rect(center=(490,570))
         screen.blit(score,score_rect)
         screen.blit(score_apple,score_apple_rect)
 
@@ -162,6 +168,11 @@ while True:
         screen.blit(square,square_rect)
         screen.blit(square2,square2_rect)
         screen.blit(square3,square3_rect)
+
+        if S_LENGTH > 1: 
+            msg = scorefont.render(f"Length: {S_LENGTH} | Score: {S_LENGTH - 1} ",False,'White')
+            msg_rect = msg.get_rect(center=(490,570))
+            screen.blit(msg,msg_rect)
 
     # update the whole screen every frame
     pygame.display.update()
