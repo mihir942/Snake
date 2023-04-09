@@ -145,6 +145,8 @@ while True:
 
         # display background
         screen.fill(("#191919"))
+
+        # display food
         food_group.draw(screen)
 
         # display score
