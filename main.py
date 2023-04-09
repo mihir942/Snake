@@ -4,18 +4,6 @@ import pygame
 from random import randrange
 
 # Sprite classes
-class Snake(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()   
-        self.image = pygame.Surface([20,20])
-        self.rect = pygame.draw.rect(self.image,'#21FA90',self.image.get_rect(),border_radius=3)
-
-        self.direction = "west"
-        self.length = 1
-
-    def check_bounds(self) -> bool:
-        return screen.get_rect().contains(self.rect)
-
 class Food(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
@@ -45,15 +33,17 @@ game_active = False
 titlefont = loadFont('babyblues.ttf',150)
 subtitlefont = loadFont('babyblues.ttf',30)
 
+# Setup - SNAKE VARIABLES
+S_direction = "west"
+S_length = 1
+S_path = []
+
 # Setup - TIMERS
 clock = pygame.time.Clock()
 snake_timer = pygame.USEREVENT + 1
 pygame.time.set_timer(snake_timer,200)
 
 # Sprites
-snake_group = pygame.sprite.GroupSingle()
-snake_group.add(Snake())
-SS = snake_group.sprite
 food_group = pygame.sprite.Group()
 
 # Surfaces - NONACTIVE
@@ -64,6 +54,7 @@ subtitle_rect = subtitle.get_rect(center=(375,420))
 
 # Main Loop
 while True:
+    
     # loop to check for events
     for event in pygame.event.get():
 
@@ -76,45 +67,53 @@ while True:
         if game_active:
             # TIMER event (for snake)
             if event.type == snake_timer:
-                direction = SS.direction
-                if direction == "west": SS.rect.centerx -= 20
-                elif direction == "north": SS.rect.centery -= 20
-                elif direction == "south": SS.rect.centery += 20
-                else: SS.rect.centerx += 20
+                head,next_pos = S_path[0],(0,0)
+                if S_direction == "west":  next_pos = (head[0] - 20,head[1])
+                elif S_direction == "north": next_pos = (head[0],head[1] - 20)
+                elif S_direction == "east": next_pos = (head[0] + 20, head[1])
+                else: next_pos = (head[0],head[1] + 20)
+                S_path.insert(0,next_pos)
 
             # KEY event (change direction)
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT and (SS.direction in ["north","south"]): SS.direction = "west"
-                elif event.key == pygame.K_UP and (SS.direction in ["west","east"]): SS.direction = "north"
-                elif event.key == pygame.K_RIGHT and (SS.direction in ["north","south"]): SS.direction = "east"
-                elif event.key == pygame.K_DOWN and (SS.direction in ["west","east"]): SS.direction = "south"
+                if event.key == pygame.K_LEFT and (S_direction in ["north","south"]): S_direction = "west"
+                elif event.key == pygame.K_UP and (S_direction in ["west","east"]): S_direction = "north"
+                elif event.key == pygame.K_RIGHT and (S_direction in ["north","south"]): S_direction = "east"
+                elif event.key == pygame.K_DOWN and (S_direction in ["west","east"]): S_direction = "south"
         
         # NONACTIVE-mode events
         else:
             # KEY event (start / restart game)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 start_position = (380,380)
-                SS.rect.center = start_position
-                SS.direction = "west"
-                SS.length = 1
+                S_path.append(start_position)
+                S_direction = "west"
                 game_active = True
 
     # what to display in ACTIVE-mode 
     if game_active:
 
-        # check if snake is out of bounds
-        game_active = SS.check_bounds()
+        # control snake length
+        S_path = S_path[0:S_length]
 
         # generate food if no food
         if not food_group: food_group.add(Food())
 
-        # collision = increase length
-        if pygame.sprite.spritecollide(SS,food_group,True): SS.length += 1
+        # check for collisions
+        if S_path[0] == food_group.sprites()[0].rect.center:
+            S_length += 1
+            food_group.empty()
 
-        # display background, snake
+        # display background
         screen.fill(("#191919"))
-        snake_group.draw(screen)
         food_group.draw(screen)
+
+        # display snake
+        for position in S_path:
+            snake_surface = pygame.Surface((20,20))
+            snake_rect = pygame.draw.rect(snake_surface,'#21FA90',snake_surface.get_rect(),width=0,border_radius=5)
+            snake_rect.center=position
+            screen.blit(snake_surface,snake_rect)
 
     # what to display in NONACTIVE-mode
     else: 
