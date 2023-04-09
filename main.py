@@ -10,9 +10,9 @@ class Food(pygame.sprite.Sprite):
         super().__init__()
 
         self.image = loadImage('apple.png').convert_alpha()
-        self.image = pygame.transform.rotozoom(self.image,0,0.6) 
+        self.image = pygame.transform.rotozoom(self.image,0,0.6)
         self.rect = self.image.get_rect(center = (randrange(20,screen_width - 20,20),randrange(20,screen_height - 20,20)))
-
+        
 # Functions to load resources
 def loadImage(name):
     working_dir = os.path.dirname(__file__)
@@ -37,6 +37,7 @@ game_active = False
 titlefont = loadFont('babyblues.ttf',150)
 subtitlefont = loadFont('babyblues.ttf',30)
 scorefont = loadFont('babyblues.ttf',20)
+
 # Setup - SNAKE VARIABLES
 S_DIRECTION = "west"
 S_LENGTH = 1
@@ -60,6 +61,18 @@ title = titlefont.render("snake",False,'White')
 title_rect = title.get_rect(center = (screen_width//2,270))
 subtitle = subtitlefont.render("the retro game",False,'White')
 subtitle_rect = subtitle.get_rect(center=(screen_height//2,345))
+
+square = pygame.Surface((12,12),pygame.SRCALPHA)
+square_rect = pygame.draw.rect(square,'#21FA90',square.get_rect(),width=0,border_radius=2)
+square_rect.center = (337,203)
+
+square2 = pygame.Surface((12,12),pygame.SRCALPHA)
+square2_rect = pygame.draw.rect(square2,'#21FA90',square2.get_rect(),width=0,border_radius=2)
+square2_rect.center = (352,203)
+
+square3 = pygame.Surface((12,12),pygame.SRCALPHA)
+square3_rect = pygame.draw.rect(square3,'#21FA90',square3.get_rect(),width=0,border_radius=2)
+square3_rect.center = (367,203)
 
 # Main Loop
 while True:
@@ -109,18 +122,19 @@ while True:
         # generate food if no food
         if not food_group: food_group.add(Food())
 
-        # collisions
+        # collision variables
         head = S_PATH[0]
-        x,y = head
-        rect = pygame.Rect(head[0],head[1],20,20)
+        centerx,centery = head
+        coll_rect = pygame.Rect(0,0,10,10)
+        coll_rect.center = (centerx,centery)
         
         # collision with food
-        if rect.colliderect(food_group.sprites()[0].rect):
+        if coll_rect.colliderect(food_group.sprites()[0].rect):
             S_LENGTH += 1
             food_group.empty()
 
         # collision with wall or itself
-        conditions = x in range(0,600) and y in range(0,600) and len(set(S_PATH)) == len(S_PATH)
+        conditions = centerx in range(20,580) and centery in range(20,580) and len(set(S_PATH)) == len(S_PATH)
         game_active = conditions
 
         # display background
@@ -145,6 +159,9 @@ while True:
         screen.fill('#A03A1B')
         screen.blit(title,title_rect)
         screen.blit(subtitle,subtitle_rect)
+        screen.blit(square,square_rect)
+        screen.blit(square2,square2_rect)
+        screen.blit(square3,square3_rect)
 
     # update the whole screen every frame
     pygame.display.update()
