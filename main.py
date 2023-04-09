@@ -1,6 +1,7 @@
 from sys import exit
 import os
 import pygame
+from random import randrange
 
 # Sprite classes
 class Snake(pygame.sprite.Sprite):
@@ -8,11 +9,18 @@ class Snake(pygame.sprite.Sprite):
         super().__init__()   
         self.image = pygame.Surface([20,20])
         self.image.fill("#21FA90")
-        self.rect = self.image.get_rect(center=(375,375))
+        self.rect = self.image.get_rect()
         self.direction = "west"
 
     def check_bounds(self) -> bool:
         return screen.get_rect().contains(self.rect)
+
+class Food(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface([20,20])
+        self.image.fill('#A03A1B')
+        self.rect = self.image.get_rect(center=(randrange(20,740,20),randrange(20,740,20)))
 
 # Functions to load resources
 def loadImage(name):
@@ -45,15 +53,16 @@ pygame.time.set_timer(snake_timer,300)
 snake_group = pygame.sprite.GroupSingle()
 snake_group.add(Snake())
 SS = snake_group.sprite
+food_group = pygame.sprite.Group()
 
-# Surfaces - NONACTIVe
+# Surfaces - NONACTIVE
 title = titlefont.render("snake",False,'White')
 title_rect = title.get_rect(center = (375,340))
 subtitle = subtitlefont.render("the retro game",False,'White')
 subtitle_rect = subtitle.get_rect(center=(375,420))
 
+# Main Loop
 while True:
-
     # loop to check for events
     for event in pygame.event.get():
 
@@ -67,10 +76,10 @@ while True:
             # TIMER event (for snake)
             if event.type == snake_timer:
                 direction = SS.direction
-                if direction == "west": SS.rect.x -= 20
-                elif direction == "north": SS.rect.y -= 20
-                elif direction == "south": SS.rect.y += 20
-                else: SS.rect.x += 20
+                if direction == "west": SS.rect.centerx -= 20
+                elif direction == "north": SS.rect.centery -= 20
+                elif direction == "south": SS.rect.centery += 20
+                else: SS.rect.centerx += 20
             
             # KEY event (change direction)
             if event.type == pygame.KEYDOWN:
@@ -81,21 +90,25 @@ while True:
         
         # NONACTIVE-mode events
         else:
-            # KEY event (restart game)
+            # KEY event (start / restart game)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                SS.rect.center = (375,375)
+                SS.rect.center = (380,380)
+                SS.direction = "west"
                 game_active = True
 
     # what to display in ACTIVE-mode 
     if game_active:
 
-        # check if snake sprite has left screen
+        # check if snake is out of bounds
         game_active = SS.check_bounds()
 
-        # display screen background, snake
+        # generate food if no food
+        if not food_group: food_group.add(Food())
+
+        # display background, snake
         screen.fill(("#191919"))
         snake_group.draw(screen)
-        snake_group.update()
+        food_group.draw(screen)
 
     # what to display in NONACTIVE-mode
     else: 
