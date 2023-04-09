@@ -8,8 +8,8 @@ class Snake(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()   
         self.image = pygame.Surface([20,20])
-        self.image.fill("#21FA90")
-        self.rect = self.image.get_rect()
+        self.rect = pygame.draw.rect(self.image,'#21FA90',self.image.get_rect(),border_radius=3)
+
         self.direction = "west"
         self.length = 1
 
@@ -48,7 +48,7 @@ subtitlefont = loadFont('babyblues.ttf',30)
 # Setup - TIMERS
 clock = pygame.time.Clock()
 snake_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(snake_timer,150)
+pygame.time.set_timer(snake_timer,200)
 
 # Sprites
 snake_group = pygame.sprite.GroupSingle()
@@ -81,7 +81,7 @@ while True:
                 elif direction == "north": SS.rect.centery -= 20
                 elif direction == "south": SS.rect.centery += 20
                 else: SS.rect.centerx += 20
-            
+
             # KEY event (change direction)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT and (SS.direction in ["north","south"]): SS.direction = "west"
@@ -93,7 +93,8 @@ while True:
         else:
             # KEY event (start / restart game)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                SS.rect.center = (380,380)
+                start_position = (380,380)
+                SS.rect.center = start_position
                 SS.direction = "west"
                 SS.length = 1
                 game_active = True
@@ -108,8 +109,7 @@ while True:
         if not food_group: food_group.add(Food())
 
         # collision = increase length
-        if pygame.sprite.spritecollide(SS,food_group,True):
-            SS.length += 1
+        if pygame.sprite.spritecollide(SS,food_group,True): SS.length += 1
 
         # display background, snake
         screen.fill(("#191919"))
