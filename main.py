@@ -11,6 +11,7 @@ class Snake(pygame.sprite.Sprite):
         self.image.fill("#21FA90")
         self.rect = self.image.get_rect()
         self.direction = "west"
+        self.length = 1
 
     def check_bounds(self) -> bool:
         return screen.get_rect().contains(self.rect)
@@ -47,7 +48,7 @@ subtitlefont = loadFont('babyblues.ttf',30)
 # Setup - TIMERS
 clock = pygame.time.Clock()
 snake_timer = pygame.USEREVENT + 1
-pygame.time.set_timer(snake_timer,300)
+pygame.time.set_timer(snake_timer,150)
 
 # Sprites
 snake_group = pygame.sprite.GroupSingle()
@@ -94,6 +95,7 @@ while True:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 SS.rect.center = (380,380)
                 SS.direction = "west"
+                SS.length = 1
                 game_active = True
 
     # what to display in ACTIVE-mode 
@@ -104,6 +106,10 @@ while True:
 
         # generate food if no food
         if not food_group: food_group.add(Food())
+
+        # collision = increase length
+        if pygame.sprite.spritecollide(SS,food_group,True):
+            SS.length += 1
 
         # display background, snake
         screen.fill(("#191919"))
